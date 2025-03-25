@@ -216,4 +216,4 @@ Nvidia的股價表現如何？有沒有遇到什麼重大波動？另外，人�
     final_response, final_prompt_tokens, final_completion_tokens = chat_with_aoai_gpt(final_messages)
     print(final_response)
 
-    # TODO: 練習建- 實現 Rerank 機制來提升相關性
+    # TODO: 練習- 實現 Rerank 機制來提升相關性
