@@ -51,6 +51,7 @@
   - `calculator.py`：將中文數學題目轉為標準運算式並計算結果
   - `stock_api.py`：串接證交所 API 進行股票查詢並生成專業報告
 
+---
 
 ### 🔸 lab03. Embedding
 
@@ -71,11 +72,37 @@
 - 練習任務：
   - 修改計算相似度的方法，嘗試使用 L2 距離 (歐氏距離)。
 
+---
+
+### 🔸 lab04. Conversation
+- 深入探討如何建立智能對話系統，實現自然且連貫的人機對話互動。
+- 核心概念：
+  - ✅ 對話狀態管理
+  - ✅ 上下文記憶與追蹤
+  - ✅ 角色設定與人設維持
+  - ✅ 對話流程控制
+- 技術重點：
+  - ➡️ 使用 Streamlit 建立互動式對話介面
+  - ➡️ Azure OpenAI 對話串接整合
+  - ➡️ 系統提示（System Prompt）設計
+  - ➡️ 對話歷史管理機制
+- 實作範例：
+  - `chatbot_app.py`：完整的 AI 對話應用程式
+  - `conversation_manager.py`：對話狀態管理工具
+  - `prompt_templates.py`：系統提示模板集合
+- 進階功能：
+  - 🔄 打字動畫效果
+  - 💾 對話記錄保存與讀取
+  - 🔒 錯誤處理與重試機制
+  - 🎯 角色切換與多重人設
+- 練習任務：
+  - 設計專業領域的對話助理
+  - 實現多輪對話邏輯控制
+  - 優化系統提示以提升回應品質
 
 ---
 
 ## 🛠️ 待續課程
-- lab04. Conversation
 - lab05. RAG-1
 - lab06. RAG-2
 - lab07. RAG-3
@@ -93,6 +120,9 @@
   - numexpr
   - threading
   - tavily-python
+  - pandas
+  - scikit-learn
+  - streamlit
 
 ---
 
