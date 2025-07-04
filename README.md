@@ -102,10 +102,44 @@
 
 ---
 
-## 🛠️ 待續課程
-- lab05. RAG-1
-- lab06. RAG-2
-- lab07. RAG-3
+### 🔸 lab05. RAG (Retrieval Augmented Generation) & AI Agent
+- 深入探討如何建立完整的 RAG 系統，結合 AI Agent 框架實現智能法律諮詢助手。
+- 核心技術棧：
+  - ✅ **Vector Database**：使用 PostgreSQL + pgvector 儲存向量資料
+  - ✅ **Embedding**：Azure OpenAI text-embedding 向量化文本
+  - ✅ **Reranker**：CrossEncoder 模型進行二次排序優化
+  - ✅ **Function Calling**：AI Agent 自動選擇和調用工具
+  - ✅ **Web Search**：整合 Tavily API 獲取即時資訊
+- RAG 系統架構：
+  - 📄 **資料處理**：PDF 解析、文本分割、向量化儲存
+  - 🔍 **檢索優化**：向量搜索 + Reranker 二次排序
+  - 🤖 **智能回答**：AI Agent 整合多種資料源生成回答
+  - 🌐 **混合檢索**：結合本地知識庫與網路搜索
+- AI Agent 功能：
+  - ➡️ **自動工具選擇**：根據問題類型智能選擇合適工具
+  - ➡️ **查詢改寫**：優化使用者問題以提升檢索準確性
+  - ➡️ **多輪對話**：支援複雜問題的分步處理
+  - ➡️ **錯誤處理**：完善的異常處理和降級機制
+- 實作範例：
+  - `rag.py`：RAG 系統核心實現
+  - `process_data.py`：資料處理和向量化工具
+  - `query_test.py`：AI Agent 查詢系統（主程式）
+  - `embedding.py`：向量計算和相似度搜索
+  - `create_cosine_similarity_function.sql`：資料庫函數設定
+- 進階功能：
+  - 🔄 **智能排序**：結合向量相似度和語義重排序
+  - 📊 **統計分析**：資料庫統計和章節分析工具
+  - 🌐 **即時資訊**：網路搜索補充最新政策和案例
+  - 🎯 **專業問答**：針對勞動基準法的專業法律諮詢
+- 技術亮點：
+  - 🚀 **Function Calling**：OpenAI 最新功能實現智能工具調用
+  - 🔧 **Reranker 優化**：使用 CrossEncoder 大幅提升檢索準確性
+  - 💬 **自然語言介面**：支援口語化問題自動理解和處理
+  - 📈 **效能監控**：Token 使用統計和處理時間追蹤
+- 練習任務：
+  - 擴展到其他法律領域的知識庫
+  - 實現更多專業工具（如法條比較、案例分析）
+  - 優化 Reranker 模型以提升特定領域的檢索效果
 
 ---
 
@@ -113,24 +147,83 @@
 - Python 3.11.7
 - Anaconda（建議使用）
 - 必要安裝套件：
-  - openai
-  - jupyter
-  - python-dotenv
-  - requests
-  - numexpr
-  - threading
-  - tavily-python
-  - pandas
-  - scikit-learn
-  - streamlit
-
+  - **核心套件**：
+    - openai
+    - python-dotenv
+    - requests
+    - numpy
+    - pandas
+  - **機器學習**：
+    - scikit-learn
+    - sentence-transformers
+    - transformers
+  - **資料庫**：
+    - psycopg2-binary
+    - pgvector
+  - **網路搜索**：
+    - tavily-python
+  - **文件處理**：
+    - PyPDF2
+    - langchain
+  - **介面開發**：
+    - jupyter
+    - streamlit
+  - **其他工具**：
+    - threading
+    - numexpr
 ---
 
 ## 🚀 使用方式
-1. 建立虛擬環境
-2. 安裝需求套件
-3. 設定 `.env` 檔案（包含 AOAI_KEY、AOAI_URL、AOAI_MODEL_VERSION、TAVILY_API_KEY 等）
-4. 依序執行各 lab 的程式範例與練習
+
+### 基本設定
+1. **建立虛擬環境**
+   ```bash
+   conda create -n llm-learning python=3.11.7
+   conda activate llm-learning
+   ```
+
+2. **安裝需求套件**
+   ```bash
+   pip install openai python-dotenv sentence-transformers psycopg2-binary tavily-python
+   ```
+
+3. **設定 `.env` 檔案**
+   ```env
+   # Azure OpenAI 設定
+   AOAI_KEY=your_azure_openai_key
+   AOAI_URL=your_azure_openai_endpoint
+   AOAI_MODEL_VERSION=your_model_deployment_name
+   
+   # Embedding 設定
+   EMBEDDING_API_KEY=your_embedding_key
+   EMBEDDING_URL=your_embedding_endpoint
+   EMBEDDING_MODEL=your_embedding_model
+   
+   # 網路搜索設定
+   TAVILY_API_KEY=your_tavily_api_key
+   
+   # 資料庫設定（適用於 lab05）
+   PG_HOST=localhost
+   PG_PORT=5432
+   PG_DATABASE=labor_law_rag
+   PG_USER=postgres
+   PG_PASSWORD=your_password
+   ```
+
+### Lab05 額外設定
+4. **PostgreSQL + pgvector 設定**（僅適用於 lab05）
+   - 安裝 PostgreSQL
+   - 執行 `process_data.py` 處理法條資料
+
+5. **執行程式**
+   ```bash
+   # 一般 lab 範例
+   python basic.py
+   
+   # Lab05 AI Agent 系統
+   cd lab05_RAG
+   python query_test.py
+   ```
 
 ---
 

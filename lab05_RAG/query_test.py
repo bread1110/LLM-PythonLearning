@@ -167,63 +167,6 @@ class LaborLawAgent:
                 }
             })
     
-    def rerank_results(self, query: str, results: List[Dict], top_k: int = 5) -> List[Dict]:
-        """
-        使用 Reranker 模型對搜索結果進行二次排序
-        
-        Args:
-            query (str): 查詢文字
-            results (List[Dict]): 原始搜索結果
-            top_k (int): 返回前k個結果
-            
-        Returns:
-            List[Dict]: 重新排序後的前k個結果
-        """
-        if not self.reranker or not results:
-            print("⚠️ Reranker 不可用或無搜索結果，返回原始結果")
-            return results[:top_k]
-        
-        print(f"🔄 使用 Reranker 對 {len(results)} 個結果進行二次排序...")
-        
-        try:
-            # 準備查詢-文檔對
-            query_doc_pairs = []
-            for result in results:
-                content = result.get('content', '')
-                # 限制文檔長度以提高效率
-                if len(content) > 512:
-                    content = content[:512] + "..."
-                query_doc_pairs.append([query, content])
-            
-            # 使用 Reranker 計算相關性分數
-            rerank_scores = self.reranker.predict(query_doc_pairs)
-            
-            # 將分數添加到結果中
-            for i, result in enumerate(results):
-                result['rerank_score'] = float(rerank_scores[i])
-            
-            # 根據 rerank 分數重新排序
-            reranked_results = sorted(results, key=lambda x: x['rerank_score'], reverse=True)
-            
-            # 返回前k個結果
-            top_results = reranked_results[:top_k]
-            
-            print(f"✅ Reranker 排序完成，返回前 {len(top_results)} 個結果")
-            
-            # 顯示排序結果摘要
-            print("📊 Reranker 排序結果摘要:")
-            for i, result in enumerate(top_results, 1):
-                original_sim = result.get('similarity', 0)
-                rerank_score = result.get('rerank_score', 0)
-                print(f"  {i}. ID:{result.get('id', 'N/A')} | 原始相似度:{original_sim:.4f} | Rerank分數:{rerank_score:.4f}")
-            
-            return top_results
-            
-        except Exception as e:
-            print(f"❌ Reranker 處理失敗: {e}")
-            print("🔄 返回原始向量搜索結果")
-            return results[:top_k]
-    
     def _tool_vector_search(self, query: str, limit: int = 15) -> Dict[str, Any]:
         """工具：向量搜索"""
         print(f"🔍 執行向量搜索: '{query}'")
@@ -324,7 +267,64 @@ class LaborLawAgent:
             print(f"❌ {error_msg}")
             return {"error": error_msg}
 
- 
+     
+    def rerank_results(self, query: str, results: List[Dict], top_k: int = 5) -> List[Dict]:
+        """
+        使用 Reranker 模型對搜索結果進行二次排序
+        
+        Args:
+            query (str): 查詢文字
+            results (List[Dict]): 原始搜索結果
+            top_k (int): 返回前k個結果
+            
+        Returns:
+            List[Dict]: 重新排序後的前k個結果
+        """
+        if not self.reranker or not results:
+            print("⚠️ Reranker 不可用或無搜索結果，返回原始結果")
+            return results[:top_k]
+        
+        print(f"🔄 使用 Reranker 對 {len(results)} 個結果進行二次排序...")
+        
+        try:
+            # 準備查詢-文檔對
+            query_doc_pairs = []
+            for result in results:
+                content = result.get('content', '')
+                # 限制文檔長度以提高效率
+                if len(content) > 512:
+                    content = content[:512] + "..."
+                query_doc_pairs.append([query, content])
+            
+            # 使用 Reranker 計算相關性分數
+            rerank_scores = self.reranker.predict(query_doc_pairs)
+            
+            # 將分數添加到結果中
+            for i, result in enumerate(results):
+                result['rerank_score'] = float(rerank_scores[i])
+            
+            # 根據 rerank 分數重新排序
+            reranked_results = sorted(results, key=lambda x: x['rerank_score'], reverse=True)
+            
+            # 返回前k個結果
+            top_results = reranked_results[:top_k]
+            
+            print(f"✅ Reranker 排序完成，返回前 {len(top_results)} 個結果")
+            
+            # 顯示排序結果摘要
+            print("📊 Reranker 排序結果摘要:")
+            for i, result in enumerate(top_results, 1):
+                original_sim = result.get('similarity', 0)
+                rerank_score = result.get('rerank_score', 0)
+                print(f"  {i}. ID:{result.get('id', 'N/A')} | 原始相似度:{original_sim:.4f} | Rerank分數:{rerank_score:.4f}")
+            
+            return top_results
+            
+        except Exception as e:
+            print(f"❌ Reranker 處理失敗: {e}")
+            print("🔄 返回原始向量搜索結果")
+            return results[:top_k]
+
     def chat_with_aoai_gpt(self, messages: list[dict], user_json_format: bool = False, 
                           tools: list = None, tool_choice: str = "auto"):
         """與 Azure OpenAI 服務互動的核心函數，支援 function calling
@@ -623,67 +623,6 @@ class LaborLawAgent:
         
         return "抱歉，AI Agent 達到最大迭代次數，無法完成回答。"
     
-    #def vector_search_with_llm(self, query: str, limit: int = 5, use_llm: bool = True) -> tuple[List[Dict], str]:
-    #    """
-    #    向量搜索並可選生成LLM回答（保持向後兼容）
-    #    
-    #    Args:
-    #        query (str): 查詢文字
-    #        limit (int): 返回結果數量限制
-    #        use_llm (bool): 是否使用LLM生成回答
-    #        
-    #    Returns:
-    #        tuple: (搜索結果, LLM回答)
-    #    """
-    #    # 使用工具執行搜索
-    #    search_result = self._tool_vector_search(query, limit)
-    #    
-    #    if search_result.get("error"):
-    #        return [], f"搜索錯誤: {search_result['error']}"
-    #    
-    #    search_results = search_result.get("results", [])
-    #    
-    #    if use_llm:
-    #        # 使用 AI agent 生成回答
-    #        llm_response = self.generate_agent_response(query)
-    #    else:
-    #        llm_response = ""
-    #    
-    #    return search_results, llm_response
-    
-    #def display_results(self, results: List[Dict], search_type: str = ""):
-    #    """
-    #    格式化顯示搜索結果
-    #    
-    #    Args:
-    #        results (List[Dict]): 搜索結果
-    #        search_type (str): 搜索類型說明
-    #    """
-    #    if not results:
-    #        print("未找到相關結果")
-    #        return
-    #    
-    #    print(f"\n{'='*50}")
-    #    print(f"{search_type}搜索結果 (共 {len(results)} 條)")
-    #    print(f"{'='*50}")
-    #    
-    #    for i, result in enumerate(results, 1):
-    #        print(f"\n【結果 {i}】")
-    #        print(f"ID: {result.get('id', 'N/A')}")
-    #        
-    #        if result.get('article_number'):
-    #            print(f"法條編號: 第 {result['article_number']} 條")
-    #        
-    #        if result.get('chapter_info'):
-    #            print(f"所屬章節: 第 {result['chapter_info']} 章")
-    #        
-    #        if 'similarity' in result:
-    #            print(f"相似度分數: {result['similarity']:.4f}")
-    #        
-    #        print(f"字符數: {result.get('char_count', 'N/A')}")
-    #        print(f"內容: {result['content'][:200]}{'...' if len(result['content']) > 200 else ''}")
-    #        print("-" * 50)
-    
     def display_llm_response(self, llm_response: str):
         """
         顯示LLM生成的回答
@@ -698,22 +637,6 @@ class LaborLawAgent:
         else:
             print("\n❌ 未能生成AI回答")
     
-    #def display_rag_results(self, search_results: List[Dict], llm_response: str, search_type: str = ""):
-    #    """
-    #    顯示完整的RAG結果（搜索結果 + LLM回答）
-    #    
-    #    Args:
-    #        search_results (List[Dict]): 搜索結果
-    #        llm_response (str): LLM回答
-    #        search_type (str): 搜索類型說明
-    #    """
-    #    # 先顯示AI回答
-    #    self.display_llm_response(llm_response)
-    #    
-    #    # 再顯示搜索結果作為參考
-    #    print(f"\n{'📚 參考資料':=^60}")
-    #    self.display_results(search_results, search_type)
-
 def main():
     """主程式 - AI Agent 互動式查詢介面"""
     print("🤖 勞動基準法 AI Agent 系統")
