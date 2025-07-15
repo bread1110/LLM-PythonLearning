@@ -27,7 +27,8 @@ from dotenv import load_dotenv
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
-from openai import AzureOpenAI
+from utils.database_config import get_database_config
+from utils.ai_client import get_embedding_for_content
 
 # PDF處理相關
 try:
@@ -58,13 +59,7 @@ class LaborLawProcessor:
         )
         
         # PostgreSQL連接配置
-        self.db_config = {
-            'host': os.getenv('PG_HOST', 'localhost'),
-            'port': os.getenv('PG_PORT', '5432'),
-            'database': os.getenv('PG_DATABASE', 'labor_law_rag'),
-            'user': os.getenv('PG_USER', 'postgres'),
-            'password': os.getenv('PG_PASSWORD', 'your_password')
-        }
+        self.db_config = get_database_config()
         
         # 多執行緒配置
         self.max_workers = 4  # 使用4個執行緒
@@ -114,27 +109,7 @@ class LaborLawProcessor:
         Returns:
             list[float]: 返回 embedding 向量，如果發生錯誤則返回空列表
         """
-        try_cnt = 2
-        while try_cnt > 0:
-            try_cnt -= 1
-            api_key = os.getenv("EMBEDDING_API_KEY")
-            api_base = os.getenv("EMBEDDING_URL")
-            embedding_model = os.getenv("EMBEDDING_MODEL")
-
-            try:
-                client = AzureOpenAI(
-                    api_key=api_key,
-                    azure_endpoint=api_base,
-                )
-                embedding = client.embeddings.create(
-                    input=content,
-                    model=embedding_model,
-                )
-                return embedding.data[0].embedding
-            except Exception as e:
-                print(f"get_embedding_resource error | err_msg={e}")
-
-        return []
+        return get_embedding_for_content(content)
 
 
     def preprocess_text(self, text: str) -> str:
