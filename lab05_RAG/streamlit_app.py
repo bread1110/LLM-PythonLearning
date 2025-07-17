@@ -788,6 +788,11 @@ class RAGStreamlitApp:
         if not details:
             return
         
+        # 生成唯一的標識符以避免重複的key
+        import time
+        import random
+        unique_id = f"{int(time.time() * 1000)}_{random.randint(1000, 9999)}"
+        
         with st.expander("🔧 技術細節", expanded=False):
             
             # 回答參考的文檔片段
@@ -819,9 +824,10 @@ class RAGStreamlitApp:
                         
                         # 完整內容 - 使用checkbox來控制顯示
                         if chunk.get("full_content"):
-                            show_full = st.checkbox(f"顯示完整內容", key=f"show_full_{i}")
+                            chunk_id = chunk.get('id', f'chunk_{i}')
+                            show_full = st.checkbox(f"顯示完整內容", key=f"show_full_{unique_id}_{chunk_id}_{i}")
                             if show_full:
-                                st.text_area("完整內容:", value=chunk["full_content"], height=150, disabled=True, key=f"chunk_content_{i}")
+                                st.text_area("完整內容:", value=chunk["full_content"], height=150, disabled=True, key=f"chunk_content_{unique_id}_{chunk_id}_{i}")
                         
                         st.divider()
                 
